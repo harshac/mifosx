@@ -7,8 +7,7 @@ package org.mifosplatform.infrastructure.documentmanagement.service;
 
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
-import org.mifosplatform.infrastructure.core.service.DocumentStore;
-import org.mifosplatform.infrastructure.core.service.FileSystemDocumentStore;
+import org.mifosplatform.infrastructure.core.service.DocumentStoreFactory;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommandValidator;
 import org.mifosplatform.infrastructure.documentmanagement.domain.Document;
@@ -34,13 +33,14 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
     private final PlatformSecurityContext context;
     private final DocumentRepository documentRepository;
-    private final DocumentStore documentStore;
+    private final DocumentStoreFactory documentStoreFactory;
 
     @Autowired
-    public DocumentWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final DocumentRepository documentRepository) {
+    public DocumentWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final DocumentRepository documentRepository,
+                                                         final DocumentStoreFactory documentStoreFactory) {
         this.context = context;
         this.documentRepository = documentRepository;
-        this.documentStore = new FileSystemDocumentStore();
+        this.documentStoreFactory = documentStoreFactory;
     }
 
     @Transactional
@@ -55,7 +55,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
             validator.validateForCreate();
 
-            final String fileLocation = this.documentStore.saveDocument(inputStream, documentCommand);
+            final String fileLocation = this.documentStoreFactory.getInstance().saveDocument(inputStream, documentCommand);
 
             final Document document = Document.createNew(documentCommand.getParentEntityType(), documentCommand.getParentEntityId(),
                     documentCommand.getName(), documentCommand.getFileName(), documentCommand.getSize(), documentCommand.getType(),
@@ -94,7 +94,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
                 // TODO provide switch to toggle between file system appender
                 // and Amazon S3 appender
-                documentCommand.setLocation(this.documentStore.saveDocument(inputStream, documentCommand));
+                documentCommand.setLocation(this.documentStoreFactory.getInstance().saveDocument(inputStream, documentCommand));
             }
 
             documentForUpdate.update(documentCommand);
