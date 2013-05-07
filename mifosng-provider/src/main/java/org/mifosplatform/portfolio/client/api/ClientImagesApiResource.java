@@ -19,6 +19,8 @@ import org.mifosplatform.portfolio.client.data.ClientData;
 import org.mifosplatform.portfolio.client.exception.ImageNotFoundException;
 import org.mifosplatform.portfolio.client.service.ClientReadPlatformService;
 import org.mifosplatform.portfolio.client.service.ClientWritePlatformService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -39,6 +41,7 @@ public class ClientImagesApiResource {
     private final ClientReadPlatformService clientReadPlatformService;
     private final ClientWritePlatformService clientWritePlatformService;
     private final DefaultToApiJsonSerializer<ClientData> toApiJsonSerializer;
+    private final static Logger logger = LoggerFactory.getLogger(ClientImagesApiResource.class);
 
     @Autowired
     public ClientImagesApiResource(final PlatformSecurityContext context, final ClientReadPlatformService readPlatformService,

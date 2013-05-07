@@ -5,9 +5,6 @@
  */
 package org.mifosplatform.portfolio.client.data;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -16,6 +13,9 @@ import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.organisation.office.data.OfficeData;
 import org.mifosplatform.portfolio.group.data.GroupGeneralData;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Immutable data object representing client data.
@@ -40,7 +40,7 @@ final public class ClientData implements Comparable<ClientData> {
     private final Long officeId;
     private final String officeName;
 
-    private final String imageKey;
+    private String imageKey;
     @SuppressWarnings("unused")
     private final Boolean imagePresent;
 
@@ -149,6 +149,9 @@ final public class ClientData implements Comparable<ClientData> {
         return StringUtils.isNotBlank(this.imageKey);
     }
 
+    public void setImageKey(String imageKey){
+        this.imageKey = imageKey;
+    }
     @Override
     public int compareTo(final ClientData obj) {
         if (obj == null) { return -1; }
