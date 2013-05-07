@@ -67,6 +67,11 @@ public class S3DocumentStore extends DocumentStore {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public DocumentStoreType getType() {
+        return DocumentStoreType.S3;
+    }
+
 
     String generateFileParentDirectory(String entityType, Long entityId) {
         return "documents" + File.separator + entityType + File.separator + entityId + File.separator + RandomStringGenerator.generateRandomString();

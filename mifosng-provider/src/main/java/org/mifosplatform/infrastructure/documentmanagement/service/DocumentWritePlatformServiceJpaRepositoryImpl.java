@@ -7,6 +7,7 @@ package org.mifosplatform.infrastructure.documentmanagement.service;
 
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.mifosplatform.infrastructure.core.service.DocumentStore;
 import org.mifosplatform.infrastructure.core.service.DocumentStoreFactory;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommandValidator;
@@ -55,11 +56,13 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
             validator.validateForCreate();
 
-            final String fileLocation = this.documentStoreFactory.getInstance().saveDocument(inputStream, documentCommand);
+            DocumentStore documentStore = this.documentStoreFactory.getInstance();
+
+            final String fileLocation = documentStore.saveDocument(inputStream, documentCommand);
 
             final Document document = Document.createNew(documentCommand.getParentEntityType(), documentCommand.getParentEntityId(),
                     documentCommand.getName(), documentCommand.getFileName(), documentCommand.getSize(), documentCommand.getType(),
-                    documentCommand.getDescription(), fileLocation);
+                    documentCommand.getDescription(), fileLocation, documentStore.getType());
 
             this.documentRepository.save(document);
 

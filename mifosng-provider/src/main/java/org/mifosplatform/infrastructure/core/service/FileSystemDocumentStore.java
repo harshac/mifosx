@@ -78,6 +78,11 @@ public class FileSystemDocumentStore extends DocumentStore {
         }
     }
 
+    @Override
+    public DocumentStoreType getType() {
+        return DocumentStoreType.FILE_SYSTEM;
+    }
+
     /**
      * Generate the directory path for storing the new document
      *

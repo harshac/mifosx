@@ -8,6 +8,8 @@ import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentMan
 import java.io.InputStream;
 
 public abstract class DocumentStore {
+    protected DocumentStoreType type;
+
     protected Integer maxFileSize = ApiConstants.MAX_FILE_UPLOAD_SIZE_IN_MB;
     protected Integer maxImageSize = ApiConstants.MAX_IMAGE_UPLOAD_SIZE_IN_MB;
 
@@ -15,7 +17,7 @@ public abstract class DocumentStore {
     public abstract String saveImage(InputStream uploadedInputStream, Long resourceId, String imageName, Long fileSize) throws DocumentManagementException;
     public abstract String saveImage(Base64EncodedImage base64EncodedImage, Long resourceId, String imageName) throws DocumentManagementException;
     public abstract void deleteImage(final Long resourceId, final String location);
-
+    public abstract DocumentStoreType getType();
 
     protected void validateFileSizeWithinPermissibleRange(Long fileSize, String name, int maxFileSize) {
         /**
