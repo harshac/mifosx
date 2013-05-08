@@ -3,6 +3,8 @@ package org.mifosplatform.infrastructure.core.service;
 import org.mifosplatform.infrastructure.core.api.ApiConstants;
 import org.mifosplatform.infrastructure.core.domain.Base64EncodedImage;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
+import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
+import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentManagementException;
 
 import java.io.InputStream;
@@ -18,6 +20,8 @@ public abstract class DocumentStore {
     public abstract String saveImage(Base64EncodedImage base64EncodedImage, Long resourceId, String imageName) throws DocumentManagementException;
     public abstract void deleteImage(final Long resourceId, final String location);
     public abstract DocumentStoreType getType();
+
+    public abstract FileData retrieveDocument(DocumentData documentData);
 
     protected void validateFileSizeWithinPermissibleRange(Long fileSize, String name, int maxFileSize) {
         /**

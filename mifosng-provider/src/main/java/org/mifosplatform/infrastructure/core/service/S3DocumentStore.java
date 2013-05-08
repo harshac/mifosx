@@ -9,6 +9,8 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.lowagie.text.pdf.codec.Base64;
 import org.mifosplatform.infrastructure.core.domain.Base64EncodedImage;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
+import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
+import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentManagementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +72,11 @@ public class S3DocumentStore extends DocumentStore {
     @Override
     public DocumentStoreType getType() {
         return DocumentStoreType.S3;
+    }
+
+    @Override
+    public FileData retrieveDocument(DocumentData documentData) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
 

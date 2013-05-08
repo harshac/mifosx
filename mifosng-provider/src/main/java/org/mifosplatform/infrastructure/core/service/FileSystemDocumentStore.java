@@ -8,6 +8,8 @@ package org.mifosplatform.infrastructure.core.service;
 import com.lowagie.text.pdf.codec.Base64;
 import org.mifosplatform.infrastructure.core.domain.Base64EncodedImage;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
+import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
+import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentManagementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +83,12 @@ public class FileSystemDocumentStore extends DocumentStore {
     @Override
     public DocumentStoreType getType() {
         return DocumentStoreType.FILE_SYSTEM;
+    }
+
+    @Override
+    public FileData retrieveDocument(DocumentData documentData) {
+        File file = new File(documentData.fileLocation());
+        return new FileData(file, documentData.fileName(), documentData.contentType());
     }
 
     /**

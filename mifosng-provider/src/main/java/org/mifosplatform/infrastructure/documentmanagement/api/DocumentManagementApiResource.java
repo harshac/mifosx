@@ -14,6 +14,7 @@ import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSeriali
 import org.mifosplatform.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
 import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
+import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
 import org.mifosplatform.infrastructure.documentmanagement.service.DocumentReadPlatformService;
 import org.mifosplatform.infrastructure.documentmanagement.service.DocumentWritePlatformService;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
@@ -27,7 +28,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
-import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -166,11 +166,10 @@ public class DocumentManagementApiResource {
 
         this.context.authenticatedUser().validateHasReadPermission(this.SystemEntityType);
 
-        final DocumentData documentData = this.documentReadPlatformService.retrieveDocument(entityType, entityId, documentId);
-        final File file = new File(documentData.fileLocation());
-        final ResponseBuilder response = Response.ok(file);
-        response.header("Content-Disposition", "attachment; filename=\"" + documentData.fileName() + "\"");
-        response.header("Content-Type", documentData.contentType());
+        final FileData fileData = this.documentReadPlatformService.retrieveDocumentAsFile(entityType, entityId, documentId);
+        final ResponseBuilder response = Response.ok(fileData.file());
+        response.header("Content-Disposition", "attachment; filename=\"" + fileData.name() + "\"");
+        response.header("Content-Type", fileData.contentType());
 
         return response.build();
     }
