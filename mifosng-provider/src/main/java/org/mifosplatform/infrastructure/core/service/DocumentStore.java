@@ -7,6 +7,7 @@ import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
 import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentManagementException;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentNotFoundException;
+import org.mifosplatform.portfolio.client.data.ImageData;
 
 import java.io.InputStream;
 
@@ -23,6 +24,7 @@ public abstract class DocumentStore {
     public abstract DocumentStoreType getType();
 
     public abstract FileData retrieveDocument(DocumentData documentData) throws DocumentNotFoundException;
+    public abstract ImageData retrieveImage(ImageData imageData);
 
     protected void validateFileSizeWithinPermissibleRange(Long fileSize, String name, int maxFileSize) {
         /**
@@ -36,4 +38,5 @@ public abstract class DocumentStore {
                     maxFileSize);
         }
     }
+
 }

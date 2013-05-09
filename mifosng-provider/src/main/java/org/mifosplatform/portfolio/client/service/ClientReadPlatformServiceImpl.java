@@ -10,6 +10,7 @@ import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.api.ApiParameterHelper;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
+import org.mifosplatform.infrastructure.core.service.DocumentStoreFactory;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.office.data.OfficeData;
@@ -47,6 +48,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
     private final OfficeReadPlatformService officeReadPlatformService;
+    private final DocumentStoreFactory documentStoreFactory;
 
     // data mappers
     private final ClientMapper clientMapper = new ClientMapper();
@@ -56,9 +58,10 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
     @Autowired
     public ClientReadPlatformServiceImpl(final PlatformSecurityContext context, final TenantAwareRoutingDataSource dataSource,
-                                         final OfficeReadPlatformService officeReadPlatformService) {
+                                         final OfficeReadPlatformService officeReadPlatformService, final DocumentStoreFactory documentStoreFactory) {
         this.context = context;
         this.officeReadPlatformService = officeReadPlatformService;
+        this.documentStoreFactory = documentStoreFactory;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
@@ -141,7 +144,6 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
     @Override
     public ClientData retrieveOne(final Long clientId) {
-
         try {
             AppUser currentUser = context.authenticatedUser();
             String hierarchy = currentUser.getOffice().getHierarchy();
@@ -160,10 +162,9 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
             try{
                 ImageData imageData = this.jdbcTemplate.queryForObject(clientImageSql, new ImageMapper());
-                clientData.setImageKey(imageData.imageKey());
+                clientData.setImageData(documentStoreFactory.getInstanceForRead(imageData.storeType()).retrieveImage(imageData));
             }
             catch (EmptyResultDataAccessException e){
-                clientData.setImageKey(null);
             }
             return ClientData.setParentGroups(clientData, parentGroups);
 
@@ -248,7 +249,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String officeName = rs.getString("officeName");
 
             return ClientData.instance(accountNo, status, officeId, officeName, id, firstname, middlename, lastname, fullname, displayName,
-                    externalId, activationDate, imageKey);
+                    externalId, activationDate, null);
         }
     }
 
@@ -292,11 +293,11 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String displayName = rs.getString("displayName");
             final String externalId = rs.getString("externalId");
             final LocalDate activationDate = JdbcSupport.getLocalDate(rs, "activationDate");
-            final String imageKey = rs.getString("imageKey");
+//            final String imageKey = rs.getString("imageKey");
             final String officeName = rs.getString("officeName");
 
             return ClientData.instance(accountNo, status, officeId, officeName, id, firstname, middlename, lastname, fullname, displayName,
-                    externalId, activationDate, imageKey);
+                    externalId, activationDate, null);
         }
 
     }

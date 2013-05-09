@@ -15,6 +15,7 @@ import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
 import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentManagementException;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentNotFoundException;
+import org.mifosplatform.portfolio.client.data.ImageData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,6 @@ public class S3DocumentStore extends DocumentStore {
         try {
             logger.info("Downloading an object");
             S3Object s3object = s3Client.getObject(new GetObjectRequest(s3BucketName, documentData.fileLocation()));
-
             fileData = new FileData(s3object.getObjectContent(),documentData.fileName(),documentData.contentType());
         } catch (AmazonServiceException ase) {
             String message = "Caught an AmazonServiceException, which means your request made it " +
@@ -103,6 +103,11 @@ public class S3DocumentStore extends DocumentStore {
             throw new DocumentNotFoundException(documentData.getParentEntityType(), documentData.getParentEntityId(), documentData.getId());
         }
         return fileData;
+    }
+
+    @Override
+    public ImageData retrieveImage(ImageData imageData) {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     String generateFileParentDirectory(String entityType, Long entityId) {

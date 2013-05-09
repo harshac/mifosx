@@ -11,6 +11,7 @@ import org.mifosplatform.infrastructure.documentmanagement.command.DocumentComma
 import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
 import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentManagementException;
+import org.mifosplatform.portfolio.client.data.ImageData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +90,13 @@ public class FileSystemDocumentStore extends DocumentStore {
     public FileData retrieveDocument(DocumentData documentData){
         File file = new File(documentData.fileLocation());
         return new FileData(file, documentData.fileName(), documentData.contentType());
+    }
+
+    @Override
+    public ImageData retrieveImage(ImageData imageData) {
+        File file = new File(imageData.imageKey());
+        imageData.setFile(file);
+        return imageData;
     }
 
     /**

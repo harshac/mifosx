@@ -29,7 +29,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import java.io.File;
 import java.io.InputStream;
 
 @Path("/clients/{clientId}/images")
@@ -126,22 +125,12 @@ public class ClientImagesApiResource {
 
         if (clientData.imageKeyDoesNotExist()) { throw new ImageNotFoundException("clients", clientId); }
 
-        File image = new File(clientData.imageKey());
-        String imageName = image.getName();
-        ResponseBuilder response = Response.ok(image);
-        response.header("Content-Disposition", "attachment; filename=\"" + imageName + "\"");
+        ResponseBuilder response = Response.ok(clientData.image());
+        response.header("Content-Disposition", "attachment; filename=\"" + clientData.imageName() + "\"");
 
         // TODO: Need a better way of determining image type
 
-        // determine image type
-        String contentType = ImageUtils.IMAGE_MIME_TYPE.JPEG.getValue();
-        if (StringUtils.endsWith(imageName, ImageUtils.IMAGE_FILE_EXTENSION.GIF.getValue())) {
-            contentType = ImageUtils.IMAGE_MIME_TYPE.GIF.getValue();
-        } else if (StringUtils.endsWith(imageName, ImageUtils.IMAGE_FILE_EXTENSION.PNG.getValue())) {
-            contentType = ImageUtils.IMAGE_MIME_TYPE.PNG.getValue();
-        }
-
-        response.header("Content-Type", contentType);
+        response.header("Content-Type", clientData.imageContentType());
         return response.build();
     }
 
