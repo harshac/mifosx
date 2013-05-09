@@ -86,7 +86,7 @@ public class FileSystemDocumentStore extends DocumentStore {
     }
 
     @Override
-    public FileData retrieveDocument(DocumentData documentData) {
+    public FileData retrieveDocument(DocumentData documentData){
         File file = new File(documentData.fileLocation());
         return new FileData(file, documentData.fileName(), documentData.contentType());
     }

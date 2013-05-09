@@ -18,14 +18,17 @@ public class ExternalServiceProperty extends AbstractPersistable<Long> {
 
     @SuppressWarnings("unused")
     @Column(name = "name", nullable = false)
-    private final String name;
+    private String name;
 
     @Column(name = "value", nullable = false)
-    private final String value;
+    private String value;
 
     public ExternalServiceProperty(final String name, final String value) {
         this.name = name;
         this.value = value;
+    }
+
+    public ExternalServiceProperty() {
     }
 
     public String getValue(){

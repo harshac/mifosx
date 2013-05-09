@@ -4,20 +4,21 @@ package org.mifosplatform.infrastructure.core.service;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import com.lowagie.text.pdf.codec.Base64;
 import org.mifosplatform.infrastructure.core.domain.Base64EncodedImage;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
 import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
 import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentManagementException;
+import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 
 public class S3DocumentStore extends DocumentStore {
 
@@ -75,10 +76,34 @@ public class S3DocumentStore extends DocumentStore {
     }
 
     @Override
-    public FileData retrieveDocument(DocumentData documentData) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+    public FileData retrieveDocument(DocumentData documentData) throws DocumentNotFoundException {
+        FileData fileData = null;
+        try {
+            logger.info("Downloading an object");
+            S3Object s3object = s3Client.getObject(new GetObjectRequest(s3BucketName, documentData.fileLocation()));
 
+            fileData = new FileData(s3object.getObjectContent(),documentData.fileName(),documentData.contentType());
+        } catch (AmazonServiceException ase) {
+            String message = "Caught an AmazonServiceException, which means your request made it " +
+                             "to Amazon S3, but was rejected with an error response" +
+                             " for some reason." +
+                             "Error Message:    " + ase.getMessage() +
+                             "HTTP Status Code: " + ase.getStatusCode() +
+                             "AWS Error Code:   " + ase.getErrorCode() +
+                             "Error Type:       " + ase.getErrorType() +
+                             "Request ID:       " + ase.getRequestId();
+            logger.error(message);
+            throw new DocumentNotFoundException(documentData.getParentEntityType(), documentData.getParentEntityId(), documentData.getId());
+        } catch (AmazonClientException ace) {
+            String message = "Caught an AmazonClientException, which means the client encountered " +
+                             "an internal error while trying to communicate with S3, " +
+                             "such as not being able to access the network." +
+                             "Error Message: " + ace.getMessage();
+            logger.error(message);
+            throw new DocumentNotFoundException(documentData.getParentEntityType(), documentData.getParentEntityId(), documentData.getId());
+        }
+        return fileData;
+    }
 
     String generateFileParentDirectory(String entityType, Long entityId) {
         return "documents" + File.separator + entityType + File.separator + entityId + File.separator + RandomStringGenerator.generateRandomString();
@@ -87,8 +112,6 @@ public class S3DocumentStore extends DocumentStore {
     String generateClientImageParentDirectory(Long resourceId) {
         return "images" + File.separator + "clients" + File.separator + resourceId;
     }
-
-
 
     private void uploadDocument(InputStream inputStream, String s3UploadLocation) throws DocumentManagementException{
         try {
@@ -116,5 +139,4 @@ public class S3DocumentStore extends DocumentStore {
             throw new DocumentManagementException(message);
         }
     }
-
 }

@@ -6,6 +6,7 @@ import org.mifosplatform.infrastructure.documentmanagement.command.DocumentComma
 import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
 import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentManagementException;
+import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentNotFoundException;
 
 import java.io.InputStream;
 
@@ -21,7 +22,7 @@ public abstract class DocumentStore {
     public abstract void deleteImage(final Long resourceId, final String location);
     public abstract DocumentStoreType getType();
 
-    public abstract FileData retrieveDocument(DocumentData documentData);
+    public abstract FileData retrieveDocument(DocumentData documentData) throws DocumentNotFoundException;
 
     protected void validateFileSizeWithinPermissibleRange(Long fileSize, String name, int maxFileSize) {
         /**

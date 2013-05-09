@@ -25,6 +25,8 @@ import org.mifosplatform.portfolio.group.service.SearchParameters;
 import org.mifosplatform.portfolio.loanaccount.data.LoanStatusEnumData;
 import org.mifosplatform.portfolio.loanproduct.service.LoanEnumerations;
 import org.mifosplatform.useradministration.domain.AppUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -39,6 +41,8 @@ import java.util.List;
 
 @Service
 public class ClientReadPlatformServiceImpl implements ClientReadPlatformService {
+    private final static Logger logger = LoggerFactory.getLogger(ClientReadPlatformServiceImpl.class);
+
 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
@@ -154,8 +158,13 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
             String clientImageSql = "select * from m_image where client_id =" + clientId;
 
-            ImageData imageData = this.jdbcTemplate.queryForObject(clientImageSql, new ImageMapper());
-            clientData.setImageKey(imageData.imageKey());
+            try{
+                ImageData imageData = this.jdbcTemplate.queryForObject(clientImageSql, new ImageMapper());
+                clientData.setImageKey(imageData.imageKey());
+            }
+            catch (EmptyResultDataAccessException e){
+                clientData.setImageKey(null);
+            }
             return ClientData.setParentGroups(clientData, parentGroups);
 
         } catch (EmptyResultDataAccessException e) {

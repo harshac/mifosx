@@ -56,7 +56,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
             validator.validateForCreate();
 
-            DocumentStore documentStore = this.documentStoreFactory.getInstance();
+            DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
 
             final String fileLocation = documentStore.saveDocument(inputStream, documentCommand);
 
@@ -97,7 +97,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
                 // TODO provide switch to toggle between file system appender
                 // and Amazon S3 appender
-                documentCommand.setLocation(this.documentStoreFactory.getInstance().saveDocument(inputStream, documentCommand));
+                documentCommand.setLocation(this.documentStoreFactory.getInstanceForWrite().saveDocument(inputStream, documentCommand));
             }
 
             documentForUpdate.update(documentCommand);

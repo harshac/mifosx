@@ -12,4 +12,4 @@ public enum DocumentStoreType {
     public String getValue() {
         return value;
     }
-}
+ }

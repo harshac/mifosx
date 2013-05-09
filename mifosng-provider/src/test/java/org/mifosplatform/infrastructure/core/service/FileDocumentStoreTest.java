@@ -21,7 +21,7 @@ public class FileDocumentStoreTest {
         DocumentData documentDataMock = mock(DocumentData.class);
         when(documentDataMock.fileName()).thenReturn("some_file");
         when(documentDataMock.fileName()).thenReturn("content_type");
-        when(documentDataMock.fileLocation()).thenReturn(".");
+        when(documentDataMock.fileLocation()).thenReturn("abcd");
 
         FileData fileData = fileSystemDocumentStore.retrieveDocument(documentDataMock);
 

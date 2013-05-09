@@ -7,7 +7,7 @@ package org.mifosplatform.infrastructure.documentmanagement.service;
 
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.DocumentStore;
-import org.mifosplatform.infrastructure.core.service.FileSystemDocumentStore;
+import org.mifosplatform.infrastructure.core.service.DocumentStoreFactory;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
 import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
@@ -28,13 +28,14 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
-    private final DocumentStore documentStore;
+    private final DocumentStoreFactory documentStoreFactory;
 
     @Autowired
-    public DocumentReadPlatformServiceImpl(final PlatformSecurityContext context, final TenantAwareRoutingDataSource dataSource) {
+    public DocumentReadPlatformServiceImpl(final PlatformSecurityContext context, final TenantAwareRoutingDataSource dataSource,
+                                           final DocumentStoreFactory documentStoreFactory) {
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.documentStore = new FileSystemDocumentStore();
+        this.documentStoreFactory = documentStoreFactory;
     }
 
     @Override
@@ -54,9 +55,12 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
     public FileData retrieveDocumentAsFile(final String entityType, final Long entityId, final Long documentId) {
         try {
             DocumentData documentData = getDocumentData(entityType, entityId, documentId);
-            return documentStore.retrieveDocument(documentData);
+            DocumentStore instanceForRead = documentStoreFactory.getInstanceForRead(documentData.storeType());
+            return instanceForRead.retrieveDocument(documentData);
         } catch (final EmptyResultDataAccessException e) {
             throw new DocumentNotFoundException(entityType, entityId, documentId);
+        } catch (final DocumentNotFoundException d) {
+            throw d;
         }
     }
 

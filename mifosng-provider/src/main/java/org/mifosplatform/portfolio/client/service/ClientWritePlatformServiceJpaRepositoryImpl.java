@@ -229,7 +229,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
             deletePreviousClientImage(clientId, client);
 
-            DocumentStore documentStore = this.documentStoreFactory.getInstance();
+            DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
             String imageLocation = documentStore.saveImage(inputStream, clientId, imageName, fileSize);
 
             return updateClientImage(clientId, client, imageLocation, documentStore.getType());
@@ -248,7 +248,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         String imageKey = imageRepository.findOneByClient(client).getKey();
         // delete image from the file system
         if (StringUtils.isNotEmpty((imageKey))) {
-            DocumentStore documentStore = this.documentStoreFactory.getInstance();
+            DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
             documentStore.deleteImage(clientId, imageKey);
         }
         return updateClientImage(clientId, client, null, null);
@@ -260,7 +260,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
             deletePreviousClientImage(clientId, client);
 
-            DocumentStore documentStore = this.documentStoreFactory.getInstance();
+            DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
             final String imageLocation = documentStore.saveImage(encodedImage, clientId, "image");
 
             return updateClientImage(clientId, client, imageLocation, documentStore.getType());
@@ -276,7 +276,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         // delete previous image from the file system
         Image image = imageRepository.findOneByClient(client);
         if (image != null){
-            this.documentStoreFactory.getInstance().deleteImage(clientId, image.getKey());
+            this.documentStoreFactory.getInstanceForWrite().deleteImage(clientId, image.getKey());
         }
     }
 

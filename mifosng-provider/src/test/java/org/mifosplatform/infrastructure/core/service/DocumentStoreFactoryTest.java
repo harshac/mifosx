@@ -35,8 +35,8 @@ public class DocumentStoreFactoryTest {
         when(applicationContextMock.getBean("externalServicesDomainService", ExternalServicesDomainService.class)).thenReturn(externalServicesDomainServiceMock);
 
 
-        DocumentStoreFactory documentStoreFactory= new DocumentStoreFactory(applicationContextMock);
-        assertEquals(documentStoreFactory.getInstance().getClass(),S3DocumentStore.class);
+        DocumentStoreFactory documentStoreFactory = new DocumentStoreFactory(applicationContextMock);
+        assertEquals(documentStoreFactory.getInstanceForWrite().getClass(),S3DocumentStore.class);
     }
 
     @Test
@@ -47,8 +47,8 @@ public class DocumentStoreFactoryTest {
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         when(applicationContext.getBean("configurationDomainServiceJpa", ConfigurationDomainService.class)).thenReturn(configurationDomainService);
 
-        DocumentStoreFactory documentStoreFactory= new DocumentStoreFactory(applicationContext);
-        assertEquals(documentStoreFactory.getInstance().getClass(),FileSystemDocumentStore.class);
+        DocumentStoreFactory documentStoreFactory = new DocumentStoreFactory(applicationContext);
+        assertEquals(documentStoreFactory.getInstanceForWrite().getClass(),FileSystemDocumentStore.class);
     }
 
 

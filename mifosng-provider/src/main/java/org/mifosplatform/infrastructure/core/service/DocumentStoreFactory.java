@@ -17,17 +17,29 @@ public class DocumentStoreFactory {
         this.applicationContext = applicationContext;
     }
 
-    public DocumentStore getInstance(){
-        DocumentStore documentStore;
+    public DocumentStore getInstanceForWrite(){
         ConfigurationDomainService configurationDomainServiceJpa = applicationContext.getBean("configurationDomainServiceJpa", ConfigurationDomainService.class);
         if(configurationDomainServiceJpa.isAmazonS3Enabled()){
-            AmazonS3Client s3Client = applicationContext.getBean("s3ClientFactory", S3ClientFactory.class).getS3Client();
-            ExternalServicesDomainService externalServicesDomainService = applicationContext.getBean("externalServicesDomainService", ExternalServicesDomainService.class);
-            documentStore = new S3DocumentStore(externalServicesDomainService.getValue("s3_bucket_name"), s3Client);
+            return createS3DocumentStore();
         }
         else {
-            documentStore = new FileSystemDocumentStore();
+            return new FileSystemDocumentStore();
         }
-        return documentStore;
     }
+
+    public DocumentStore getInstanceForRead(DocumentStoreType documentStoreType){
+        if(documentStoreType == DocumentStoreType.FILE_SYSTEM){
+            return new FileSystemDocumentStore();
+        }
+        else {
+            return createS3DocumentStore();
+        }
+    }
+    private DocumentStore createS3DocumentStore() {
+        AmazonS3Client s3Client = applicationContext.getBean("s3ClientFactory", S3ClientFactory.class).getS3Client();
+        ExternalServicesDomainService externalServicesDomainService = applicationContext.getBean("externalServicesDomainService", ExternalServicesDomainService.class);
+        return new S3DocumentStore(externalServicesDomainService.getValue("s3_bucket_name"), s3Client);
+    }
+
+
 }
