@@ -228,7 +228,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
             deletePreviousClientImage(clientId, client);
 
-            DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
+            DocumentStore documentStore = this.documentStoreFactory.getInstanceFromConfiguration();
             String imageLocation = documentStore.saveImage(inputStream, clientId, imageName, fileSize);
             return updateClientImage(clientId, client, imageLocation, documentStore.getType().getValue());
         } catch (DocumentManagementException dme) {
@@ -247,7 +247,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         String imageKey = image.getKey();
         // delete image from the file system
         if (StringUtils.isNotEmpty((imageKey))) {
-            DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
+            DocumentStore documentStore = this.documentStoreFactory.getInstanceFromConfiguration();
             documentStore.deleteImage(clientId, imageKey);
             this.imageRepository.delete(image);
         }
@@ -261,7 +261,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
             deletePreviousClientImage(clientId, client);
 
-            DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
+            DocumentStore documentStore = this.documentStoreFactory.getInstanceFromConfiguration();
             final String imageLocation = documentStore.saveImage(encodedImage, clientId, "image");
 
             return updateClientImage(clientId, client, imageLocation, documentStore.getType().getValue());
@@ -276,7 +276,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
         Image image = imageRepository.findOneByClient(client);
         if (image != null){
-            this.documentStoreFactory.getInstanceForWrite().deleteImage(clientId, image.getKey());
+            this.documentStoreFactory.getInstanceFromConfiguration().deleteImage(clientId, image.getKey());
         }
     }
 

@@ -55,7 +55,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
             validator.validateForCreate();
 
-            DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
+            DocumentStore documentStore = this.documentStoreFactory.getInstanceFromConfiguration();
 
             final String fileLocation = documentStore.saveDocument(inputStream, documentCommand);
 
@@ -92,13 +92,13 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
                     documentCommand.getParentEntityId(), documentCommand.getId()); }
             oldLocation = documentForUpdate.getLocation();
             if (inputStream != null && documentCommand.isFileNameChanged()) {
-                documentCommand.setLocation(this.documentStoreFactory.getInstanceForWrite().saveDocument(inputStream, documentCommand));
+                documentCommand.setLocation(this.documentStoreFactory.getInstanceFromConfiguration().saveDocument(inputStream, documentCommand));
             }
 
             documentForUpdate.update(documentCommand);
 
             if (inputStream != null && documentCommand.isFileNameChanged()) {
-                DocumentStore documentStore = this.documentStoreFactory.getInstanceForRead(documentForUpdate.storageType());
+                DocumentStore documentStore = this.documentStoreFactory.getInstanceFromStorageType(documentForUpdate.storageType());
                 documentStore.deleteDocument(documentCommand.getName(), oldLocation);
             }
 
@@ -123,7 +123,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
         validateParentEntityType(documentCommand);
         // TODO: Check document is present under this entity Id
         final Document document = this.documentRepository.findOne(documentCommand.getId());
-        DocumentStore documentStore = this.documentStoreFactory.getInstanceForRead(document.storageType());
+        DocumentStore documentStore = this.documentStoreFactory.getInstanceFromStorageType(document.storageType());
         if (document == null) { throw new DocumentNotFoundException(documentCommand.getParentEntityType(),
                 documentCommand.getParentEntityId(), documentCommand.getId()); }
 

@@ -162,7 +162,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
             try{
                 ImageData imageData = this.jdbcTemplate.queryForObject(clientImageSql, new ImageMapper());
-                clientData.setImageData(documentStoreFactory.getInstanceForRead(imageData.storeType()).retrieveImage(imageData));
+                clientData.setImageData(documentStoreFactory.getInstanceFromStorageType(imageData.storeType()).retrieveImage(imageData));
             }
             catch (EmptyResultDataAccessException e){
             }

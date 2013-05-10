@@ -55,7 +55,7 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
     public FileData retrieveDocumentAsFile(final String entityType, final Long entityId, final Long documentId) {
         try {
             DocumentData documentData = getDocumentData(entityType, entityId, documentId);
-            DocumentStore instanceForRead = documentStoreFactory.getInstanceForRead(documentData.storeType());
+            DocumentStore instanceForRead = documentStoreFactory.getInstanceFromStorageType(documentData.storeType());
             return instanceForRead.retrieveDocument(documentData);
         } catch (final EmptyResultDataAccessException e) {
             throw new DocumentNotFoundException(entityType, entityId, documentId);

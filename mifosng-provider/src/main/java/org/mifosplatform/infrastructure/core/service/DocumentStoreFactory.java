@@ -17,7 +17,7 @@ public class DocumentStoreFactory {
         this.applicationContext = applicationContext;
     }
 
-    public DocumentStore getInstanceForWrite(){
+    public DocumentStore getInstanceFromConfiguration(){
         ConfigurationDomainService configurationDomainServiceJpa = applicationContext.getBean("configurationDomainServiceJpa", ConfigurationDomainService.class);
         if(configurationDomainServiceJpa.isAmazonS3Enabled()){
             return createS3DocumentStore();
@@ -27,7 +27,7 @@ public class DocumentStoreFactory {
         }
     }
 
-    public DocumentStore getInstanceForRead(DocumentStoreType documentStoreType){
+    public DocumentStore getInstanceFromStorageType(DocumentStoreType documentStoreType){
         if(documentStoreType == DocumentStoreType.FILE_SYSTEM){
             return new FileSystemDocumentStore();
         }

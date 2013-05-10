@@ -36,7 +36,7 @@ public class DocumentStoreFactoryTest {
 
 
         DocumentStoreFactory documentStoreFactory = new DocumentStoreFactory(applicationContextMock);
-        assertEquals(documentStoreFactory.getInstanceForWrite().getClass(),S3DocumentStore.class);
+        assertEquals(documentStoreFactory.getInstanceFromConfiguration().getClass(),S3DocumentStore.class);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class DocumentStoreFactoryTest {
         when(applicationContext.getBean("configurationDomainServiceJpa", ConfigurationDomainService.class)).thenReturn(configurationDomainService);
 
         DocumentStoreFactory documentStoreFactory = new DocumentStoreFactory(applicationContext);
-        assertEquals(documentStoreFactory.getInstanceForWrite().getClass(),FileSystemDocumentStore.class);
+        assertEquals(documentStoreFactory.getInstanceFromConfiguration().getClass(),FileSystemDocumentStore.class);
     }
 
 
