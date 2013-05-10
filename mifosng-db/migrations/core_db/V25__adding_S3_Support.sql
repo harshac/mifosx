@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS m_external_services (
 	UNIQUE(name) 
 );
 
-INSERT INTO m_external_services (name) VALUES ('s3_cdn_url');
 INSERT INTO m_external_services (name) VALUES ('s3_bucket_name');
 INSERT INTO m_external_services (name) VALUES ('s3_access_key');
 INSERT INTO m_external_services (name) VALUES ('s3_secret_key');
