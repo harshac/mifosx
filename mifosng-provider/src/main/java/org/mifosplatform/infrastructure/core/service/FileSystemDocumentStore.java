@@ -95,7 +95,7 @@ public class FileSystemDocumentStore extends DocumentStore {
     @Override
     public ImageData retrieveImage(ImageData imageData) {
         File file = new File(imageData.imageKey());
-        imageData.setFile(file);
+        imageData.setContent(file);
         return imageData;
     }
 

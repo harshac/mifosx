@@ -84,22 +84,10 @@ public class S3DocumentStore extends DocumentStore {
             S3Object s3object = s3Client.getObject(new GetObjectRequest(s3BucketName, documentData.fileLocation()));
             fileData = new FileData(s3object.getObjectContent(),documentData.fileName(),documentData.contentType());
         } catch (AmazonServiceException ase) {
-            String message = "Caught an AmazonServiceException, which means your request made it " +
-                             "to Amazon S3, but was rejected with an error response" +
-                             " for some reason." +
-                             "Error Message:    " + ase.getMessage() +
-                             "HTTP Status Code: " + ase.getStatusCode() +
-                             "AWS Error Code:   " + ase.getErrorCode() +
-                             "Error Type:       " + ase.getErrorType() +
-                             "Request ID:       " + ase.getRequestId();
-            logger.error(message);
+            getObjectAmazonServiceExceptionMessage(ase);
             throw new DocumentNotFoundException(documentData.getParentEntityType(), documentData.getParentEntityId(), documentData.getId());
         } catch (AmazonClientException ace) {
-            String message = "Caught an AmazonClientException, which means the client encountered " +
-                             "an internal error while trying to communicate with S3, " +
-                             "such as not being able to access the network." +
-                             "Error Message: " + ace.getMessage();
-            logger.error(message);
+            getObjectAmazonClientExceptionMessage(ace);
             throw new DocumentNotFoundException(documentData.getParentEntityType(), documentData.getParentEntityId(), documentData.getId());
         }
         return fileData;
@@ -107,7 +95,9 @@ public class S3DocumentStore extends DocumentStore {
 
     @Override
     public ImageData retrieveImage(ImageData imageData) {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        S3Object s3object = s3Client.getObject(new GetObjectRequest(s3BucketName, imageData.imageKey()));
+        imageData.setContent(s3object.getObjectContent());
+        return imageData;
     }
 
     String generateFileParentDirectory(String entityType, Long entityId) {
@@ -143,5 +133,25 @@ public class S3DocumentStore extends DocumentStore {
             logger.error(message);
             throw new DocumentManagementException(message);
         }
+    }
+
+    private void getObjectAmazonClientExceptionMessage(AmazonClientException ace) {
+        String message = "Caught an AmazonClientException, which means the client encountered " +
+                "an internal error while trying to communicate with S3, " +
+                "such as not being able to access the network." +
+                "Error Message: " + ace.getMessage();
+        logger.error(message);
+    }
+
+    private void getObjectAmazonServiceExceptionMessage(AmazonServiceException ase) {
+        String message = "Caught an AmazonServiceException, which means your request made it " +
+                "to Amazon S3, but was rejected with an error response" +
+                " for some reason." +
+                "Error Message:    " + ase.getMessage() +
+                "HTTP Status Code: " + ase.getStatusCode() +
+                "AWS Error Code:   " + ase.getErrorCode() +
+                "Error Type:       " + ase.getErrorType() +
+                "Request ID:       " + ase.getRequestId();
+        logger.error(message);
     }
 }

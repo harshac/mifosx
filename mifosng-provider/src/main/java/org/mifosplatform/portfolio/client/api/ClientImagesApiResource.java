@@ -110,8 +110,7 @@ public class ClientImagesApiResource {
             imageDataURISuffix = ImageUtils.IMAGE_DATA_URI_SUFFIX.PNG.getValue();
         }
 
-        String clientImageAsBase64Text = imageDataURISuffix + Base64.encodeFromFile(clientData.imageKey());
-
+        String clientImageAsBase64Text = imageDataURISuffix + Base64.encodeBytes(clientData.image());
         return clientImageAsBase64Text;
     }
 

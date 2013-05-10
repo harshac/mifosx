@@ -1,10 +1,14 @@
 package org.mifosplatform.portfolio.client.data;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.util.IOUtils;
 import org.mifosplatform.infrastructure.core.service.DocumentStoreType;
 import org.mifosplatform.infrastructure.core.service.ImageUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class ImageData {
 
@@ -15,6 +19,7 @@ public class ImageData {
     private File file;
     private String contentType;
     private String name;
+    private InputStream inputStream;
 
 
     public ImageData(Long clientId, String key, String storeType) {
@@ -27,12 +32,15 @@ public class ImageData {
         return this.key;
     }
 
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-    public File getFile() {
-        return file;
+    public byte[] getContent() throws IOException {
+        if(inputStream == null){
+            FileInputStream fileInputStream = new FileInputStream(file);
+            return IOUtils.toByteArray(fileInputStream);
+        }
+        else
+        {
+            return IOUtils.toByteArray(inputStream);
+        }
     }
 
     private String setImageContentType() {
@@ -51,7 +59,8 @@ public class ImageData {
     }
 
     public DocumentStoreType storeType() {
-        //need to refactor. Get Enum constant from enum value
+        //TODO : need to refactor. Get Enum constant from enum value
+
         if (storeType.equals(DocumentStoreType.FILE_SYSTEM.getValue())) {
             return DocumentStoreType.FILE_SYSTEM;
         } else {
@@ -64,4 +73,11 @@ public class ImageData {
     }
 
 
+    public void setContent(InputStream objectContent) {
+        this.inputStream = objectContent;
+    }
+
+    public void setContent(File file) {
+        this.file = file;
+    }
 }

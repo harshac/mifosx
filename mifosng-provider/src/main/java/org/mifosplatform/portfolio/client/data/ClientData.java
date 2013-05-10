@@ -16,7 +16,7 @@ import org.mifosplatform.portfolio.group.data.GroupGeneralData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -205,15 +205,20 @@ final public class ClientData implements Comparable<ClientData> {
         this.imageData = imageData;
     }
 
-    public File image() {
-        return imageData.getFile();
-    }
-
     public String imageName() {
         return imageData.name();
     }
 
     public String imageContentType() {
         return imageData.contentType();
+    }
+
+    public byte[] image(){
+        try{
+            return imageData.getContent();
+        }catch (IOException ioe){
+            logger.error("Error in fetching client image");
+            return null;
+        }
     }
 }
