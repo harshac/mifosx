@@ -46,7 +46,15 @@ public class S3DocumentStore extends DocumentStore {
 
     @Override
     public void deleteDocument(String documentName, String documentPath) throws DocumentManagementException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        try{
+            deleteObjectFromS3(documentPath);
+        }catch (AmazonServiceException ase){
+            deleteObjectAmazonServiceExceptionMessage(ase);
+            throw new DocumentManagementException(documentName);
+        }catch (AmazonClientException ace){
+            deleteObjectAmazonClientExceptionMessage(ace);
+            throw new DocumentManagementException(documentName);
+        }
     }
 
     @Override
@@ -73,22 +81,34 @@ public class S3DocumentStore extends DocumentStore {
     @Override
     public void deleteImage(Long resourceId, String location) {
         try {
-            s3Client.deleteObject(new DeleteObjectRequest(s3BucketName, location));
+            deleteObjectFromS3(location);
         } catch (AmazonServiceException ase) {
-            String message = "Caught an AmazonServiceException." +
-                    "Error Message:    " + ase.getMessage() +
-                    "HTTP Status Code: " + ase.getStatusCode() +
-                    "AWS Error Code:   " + ase.getErrorCode() +
-                    "Error Type:       " + ase.getErrorType() +
-                    "Request ID:       " + ase.getRequestId();
-            logger.error(message);
+            deleteObjectAmazonServiceExceptionMessage(ase);
             logger.warn("Unable to delete image associated with clients with Id " + resourceId);
         } catch (AmazonClientException ace) {
-            String message = "Caught an AmazonClientException." +
-                    "Error Message: " + ace.getMessage();
-            logger.error(message);
+            deleteObjectAmazonClientExceptionMessage(ace);
             logger.warn("Unable to delete image associated with clients with Id " + resourceId);
         }
+    }
+
+    private void deleteObjectAmazonClientExceptionMessage(AmazonClientException ace) {
+        String message = "Caught an AmazonClientException." +
+                "Error Message: " + ace.getMessage();
+        logger.error(message);
+    }
+
+    private void deleteObjectAmazonServiceExceptionMessage(AmazonServiceException ase) {
+        String message = "Caught an AmazonServiceException." +
+                "Error Message:    " + ase.getMessage() +
+                "HTTP Status Code: " + ase.getStatusCode() +
+                "AWS Error Code:   " + ase.getErrorCode() +
+                "Error Type:       " + ase.getErrorType() +
+                "Request ID:       " + ase.getRequestId();
+        logger.error(message);
+    }
+
+    private void deleteObjectFromS3(String location) {
+        s3Client.deleteObject(new DeleteObjectRequest(s3BucketName, location));
     }
 
     @Override
