@@ -9,6 +9,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.service.DocumentStore;
 import org.mifosplatform.infrastructure.core.service.DocumentStoreFactory;
+import org.mifosplatform.infrastructure.core.service.DocumentStoreType;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommandValidator;
 import org.mifosplatform.infrastructure.documentmanagement.domain.Document;
@@ -88,17 +89,20 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
             // TODO check if entity id is valid and within data scope for the
             // user
             final Document documentForUpdate = this.documentRepository.findOne(documentCommand.getId());
+            DocumentStoreType documentStoreType = documentForUpdate.storageType();
             if (documentForUpdate == null) { throw new DocumentNotFoundException(documentCommand.getParentEntityType(),
                     documentCommand.getParentEntityId(), documentCommand.getId()); }
             oldLocation = documentForUpdate.getLocation();
             if (inputStream != null && documentCommand.isFileNameChanged()) {
-                documentCommand.setLocation(this.documentStoreFactory.getInstanceFromConfiguration().saveDocument(inputStream, documentCommand));
+                DocumentStore instanceFromConfiguration = this.documentStoreFactory.getInstanceFromConfiguration();
+                documentCommand.setLocation(instanceFromConfiguration.saveDocument(inputStream, documentCommand));
+                documentCommand.setStorageType(instanceFromConfiguration.getType());
             }
 
             documentForUpdate.update(documentCommand);
 
             if (inputStream != null && documentCommand.isFileNameChanged()) {
-                DocumentStore documentStore = this.documentStoreFactory.getInstanceFromStorageType(documentForUpdate.storageType());
+                DocumentStore documentStore = this.documentStoreFactory.getInstanceFromStorageType(documentStoreType);
                 documentStore.deleteDocument(documentCommand.getName(), oldLocation);
             }
 

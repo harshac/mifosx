@@ -86,6 +86,7 @@ public class Document extends AbstractPersistable<Long> {
         if (command.isSizeChanged()) {
             this.size = command.getSize();
         }
+        this.storageType = command.storageType();
     }
 
     public String getParentEntityType() {
