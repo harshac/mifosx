@@ -6,6 +6,7 @@
 package org.mifosplatform.infrastructure.documentmanagement.domain;
 
 import org.apache.commons.lang.StringUtils;
+import org.mifosplatform.infrastructure.core.service.DocumentStore;
 import org.mifosplatform.infrastructure.core.service.DocumentStoreType;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -149,5 +150,9 @@ public class Document extends AbstractPersistable<Long> {
 
     public void setLocation(final String location) {
         this.location = location;
+    }
+
+    public DocumentStoreType storageType(){
+        return DocumentStore.getDocumentStoreType(this.storageType);
     }
 }

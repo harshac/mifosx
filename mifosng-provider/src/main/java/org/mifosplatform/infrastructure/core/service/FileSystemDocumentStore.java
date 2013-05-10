@@ -73,12 +73,22 @@ public class FileSystemDocumentStore extends DocumentStore {
 
     @Override
     public void deleteImage(final Long resourceId, final String location) {
-        File fileToBeDeleted = new File(location);
-        boolean fileDeleted = fileToBeDeleted.delete();
+        final boolean fileDeleted = deleteFile(location);
         if (!fileDeleted) {
             // no need to throw an Error, simply log a warning
             logger.warn("Unable to delete image associated with clients with Id " + resourceId);
         }
+    }
+
+    @Override
+    public void deleteDocument(String documentName, String documentPath) throws DocumentManagementException{
+        final boolean fileDeleted = deleteFile(documentPath);
+        if (!fileDeleted) { throw new DocumentManagementException(documentName); }
+    }
+
+    private boolean deleteFile(String documentPath) {
+        final File fileToBeDeleted = new File(documentPath);
+        return fileToBeDeleted.delete();
     }
 
     @Override

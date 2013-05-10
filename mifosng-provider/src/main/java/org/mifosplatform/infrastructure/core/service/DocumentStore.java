@@ -18,13 +18,15 @@ public abstract class DocumentStore {
     protected Integer maxImageSize = ApiConstants.MAX_IMAGE_UPLOAD_SIZE_IN_MB;
 
     public abstract String saveDocument(InputStream uploadedInputStream, DocumentCommand documentCommand) throws DocumentManagementException;
+    public abstract void deleteDocument(String documentName, String documentPath) throws DocumentManagementException;
+    public abstract FileData retrieveDocument(DocumentData documentData) throws DocumentNotFoundException;
+
     public abstract String saveImage(InputStream uploadedInputStream, Long resourceId, String imageName, Long fileSize) throws DocumentManagementException;
     public abstract String saveImage(Base64EncodedImage base64EncodedImage, Long resourceId, String imageName) throws DocumentManagementException;
     public abstract void deleteImage(final Long resourceId, final String location);
-    public abstract DocumentStoreType getType();
-
-    public abstract FileData retrieveDocument(DocumentData documentData) throws DocumentNotFoundException;
     public abstract ImageData retrieveImage(ImageData imageData);
+
+    public abstract DocumentStoreType getType();
 
     protected void validateFileSizeWithinPermissibleRange(Long fileSize, String name, int maxFileSize) {
         /**

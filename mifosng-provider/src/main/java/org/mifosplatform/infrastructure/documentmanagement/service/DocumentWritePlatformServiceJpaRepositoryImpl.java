@@ -24,7 +24,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.io.InputStream;
 
 @Service
@@ -92,19 +91,15 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
             if (documentForUpdate == null) { throw new DocumentNotFoundException(documentCommand.getParentEntityType(),
                     documentCommand.getParentEntityId(), documentCommand.getId()); }
             oldLocation = documentForUpdate.getLocation();
-            // if a new file is also passed in
             if (inputStream != null && documentCommand.isFileNameChanged()) {
-
-                // TODO provide switch to toggle between file system appender
-                // and Amazon S3 appender
                 documentCommand.setLocation(this.documentStoreFactory.getInstanceForWrite().saveDocument(inputStream, documentCommand));
             }
 
             documentForUpdate.update(documentCommand);
 
             if (inputStream != null && documentCommand.isFileNameChanged()) {
-                // delete previous file
-                deleteFile(documentCommand.getName(), oldLocation);
+                DocumentStore documentStore = this.documentStoreFactory.getInstanceForRead(documentForUpdate.storageType());
+                documentStore.deleteDocument(documentCommand.getName(), oldLocation);
             }
 
             this.documentRepository.saveAndFlush(documentForUpdate);
@@ -128,18 +123,13 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
         validateParentEntityType(documentCommand);
         // TODO: Check document is present under this entity Id
         final Document document = this.documentRepository.findOne(documentCommand.getId());
+        DocumentStore documentStore = this.documentStoreFactory.getInstanceForRead(document.storageType());
         if (document == null) { throw new DocumentNotFoundException(documentCommand.getParentEntityType(),
                 documentCommand.getParentEntityId(), documentCommand.getId()); }
 
         this.documentRepository.delete(document);
-        deleteFile(document.getName(), document.getLocation());
+        documentStore.deleteDocument(document.getName(), document.getLocation());
         return new CommandProcessingResult(document.getId());
-    }
-
-    private void deleteFile(final String documentName, final String location) {
-        final File fileToBeDeleted = new File(location);
-        final boolean fileDeleted = fileToBeDeleted.delete();
-        if (!fileDeleted) { throw new DocumentManagementException(documentName); }
     }
 
     private void validateParentEntityType(final DocumentCommand documentCommand) {

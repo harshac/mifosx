@@ -45,6 +45,11 @@ public class S3DocumentStore extends DocumentStore {
     }
 
     @Override
+    public void deleteDocument(String documentName, String documentPath) throws DocumentManagementException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public String saveImage(InputStream toUploadInputStream, Long resourceId, String imageName, Long fileSize) throws DocumentManagementException {
         validateFileSizeWithinPermissibleRange(fileSize, imageName, maxImageSize);
 
