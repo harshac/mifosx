@@ -15,7 +15,7 @@ import javax.persistence.*;
 public final class Image extends AbstractPersistable<Long> {
 
     //    @Column(name = "`client_id`")
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     @JoinColumn(name = "`client_id`")
     private Client client;
 

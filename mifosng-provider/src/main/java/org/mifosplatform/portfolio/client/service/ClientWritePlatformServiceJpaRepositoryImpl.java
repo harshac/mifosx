@@ -16,7 +16,6 @@ import org.mifosplatform.infrastructure.core.domain.Base64EncodedImage;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.service.DocumentStore;
 import org.mifosplatform.infrastructure.core.service.DocumentStoreFactory;
-import org.mifosplatform.infrastructure.core.service.DocumentStoreType;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentManagementException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.office.domain.Office;
@@ -231,8 +230,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
             DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
             String imageLocation = documentStore.saveImage(inputStream, clientId, imageName, fileSize);
-
-            return updateClientImage(clientId, client, imageLocation, documentStore.getType());
+            return updateClientImage(clientId, client, imageLocation, documentStore.getType().getValue());
         } catch (DocumentManagementException dme) {
             logger.error(dme.getMessage(), dme);
             throw new DocumentManagementException(imageName);
@@ -245,13 +243,16 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
         final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
 
-        String imageKey = imageRepository.findOneByClient(client).getKey();
+        Image image = imageRepository.findOneByClient(client);
+        String imageKey = image.getKey();
         // delete image from the file system
         if (StringUtils.isNotEmpty((imageKey))) {
             DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
             documentStore.deleteImage(clientId, imageKey);
+            this.imageRepository.delete(image);
         }
-        return updateClientImage(clientId, client, null, null);
+
+        return new CommandProcessingResult(clientId) ;
     }
 
     @Override
@@ -263,7 +264,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             DocumentStore documentStore = this.documentStoreFactory.getInstanceForWrite();
             final String imageLocation = documentStore.saveImage(encodedImage, clientId, "image");
 
-            return updateClientImage(clientId, client, imageLocation, documentStore.getType());
+            return updateClientImage(clientId, client, imageLocation, documentStore.getType().getValue());
         } catch (DocumentManagementException dme) {
             logger.error(dme.getMessage(), dme);
             throw new DocumentManagementException("image");
@@ -273,23 +274,21 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private void deletePreviousClientImage(final Long clientId, final Client client) {
         if (client == null) { throw new ClientNotFoundException(clientId); }
 
-        // delete previous image from the file system
         Image image = imageRepository.findOneByClient(client);
         if (image != null){
             this.documentStoreFactory.getInstanceForWrite().deleteImage(clientId, image.getKey());
         }
     }
 
-    private CommandProcessingResult updateClientImage(final Long clientId, final Client client, final String imageLocation, final DocumentStoreType documentStoreType) {
+    private CommandProcessingResult updateClientImage(final Long clientId, final Client client, final String imageLocation, final String documentStoreType) {
         Image image = imageRepository.findOneByClient(client);
         if(image == null){
             image = new Image(client);
         }
         image.updateKey(imageLocation);
-        image.updateStorageType(documentStoreType.getValue());
+        image.updateStorageType(documentStoreType);
 
         this.imageRepository.save(image);
-
         return new CommandProcessingResult(clientId);
     }
 
