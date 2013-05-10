@@ -3,10 +3,7 @@ package org.mifosplatform.infrastructure.core.service;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectResult;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
@@ -108,6 +105,16 @@ public class S3DocumentStoreTest {
         S3DocumentStore s3DocumentStore = new S3DocumentStore("bucketName",s3ClientMock);
 
         s3DocumentStore.retrieveDocument(documentDataMock);
+    }
+
+    @Test
+    public void shouldDeleteImageFromS3() throws IOException {
+        AmazonS3Client s3ClientMock = mock(AmazonS3Client.class);
+        S3DocumentStore s3DocumentStore = new S3DocumentStore("bucketName",s3ClientMock);
+
+        s3DocumentStore.deleteImage(123L,"imagekey");
+
+        verify(s3ClientMock, times(1)).deleteObject(Matchers.<DeleteObjectRequest>anyObject());
     }
 
     private void initRetrieve() {
