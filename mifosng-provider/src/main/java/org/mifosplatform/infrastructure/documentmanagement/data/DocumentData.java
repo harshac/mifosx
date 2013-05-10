@@ -5,6 +5,7 @@
  */
 package org.mifosplatform.infrastructure.documentmanagement.data;
 
+import org.mifosplatform.infrastructure.core.service.DocumentStore;
 import org.mifosplatform.infrastructure.core.service.DocumentStoreType;
 
 /**
@@ -61,13 +62,7 @@ public class DocumentData {
     }
 
     public DocumentStoreType storeType(){
-        //need to refactor. Get Enum constant from enum value
-        if(storageType.equals(DocumentStoreType.FILE_SYSTEM.getValue())){
-            return DocumentStoreType.FILE_SYSTEM;
-        }
-        else {
-            return DocumentStoreType.S3;
-        }
+        return DocumentStore.getDocumentStoreType(storageType);
     }
 
     public String getParentEntityType(){

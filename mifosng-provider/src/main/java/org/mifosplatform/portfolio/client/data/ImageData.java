@@ -2,6 +2,7 @@ package org.mifosplatform.portfolio.client.data;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
+import org.mifosplatform.infrastructure.core.service.DocumentStore;
 import org.mifosplatform.infrastructure.core.service.DocumentStoreType;
 import org.mifosplatform.infrastructure.core.service.ImageUtils;
 
@@ -59,13 +60,7 @@ public class ImageData {
     }
 
     public DocumentStoreType storeType() {
-        //TODO : need to refactor. Get Enum constant from enum value
-
-        if (storeType.equals(DocumentStoreType.FILE_SYSTEM.getValue())) {
-            return DocumentStoreType.FILE_SYSTEM;
-        } else {
-            return DocumentStoreType.S3;
-        }
+        return DocumentStore.getDocumentStoreType(storeType);
     }
 
     public String name(){

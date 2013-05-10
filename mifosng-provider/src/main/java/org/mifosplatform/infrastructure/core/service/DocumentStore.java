@@ -39,4 +39,12 @@ public abstract class DocumentStore {
         }
     }
 
+    public static DocumentStoreType getDocumentStoreType(String documentStoreType){
+        if (documentStoreType.equals(DocumentStoreType.FILE_SYSTEM.getValue())) {
+            return DocumentStoreType.FILE_SYSTEM;
+        } else {
+            return DocumentStoreType.S3;
+        }
+    }
+
 }
