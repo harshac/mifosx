@@ -126,7 +126,7 @@ public class DocumentCommand {
         this.storageType = storageType;
     }
 
-    public String storageType(){
+    public String getStorageType(){
         return storageType.getValue();
     }
 }
