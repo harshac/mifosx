@@ -119,15 +119,16 @@ public class S3DocumentStore extends DocumentStore {
     @Override
     public FileData retrieveDocument(DocumentData documentData) throws DocumentNotFoundException {
         FileData fileData = null;
+        String fileName = documentData.fileName();
         try {
             logger.info("Downloading an object");
             S3Object s3object = s3Client.getObject(new GetObjectRequest(s3BucketName, documentData.fileLocation()));
-            fileData = new FileData(s3object.getObjectContent(), documentData.fileName(), documentData.contentType());
+            fileData = new FileData(s3object.getObjectContent(), fileName, documentData.contentType());
         } catch (AmazonServiceException ase) {
-            getObjectAmazonServiceExceptionMessage(ase);
+            getObjectAmazonServiceExceptionMessage(ase,fileName);
             throw new DocumentNotFoundException(documentData.getParentEntityType(), documentData.getParentEntityId(), documentData.getId());
         } catch (AmazonClientException ace) {
-            getObjectAmazonClientExceptionMessage(ace);
+            getObjectAmazonClientExceptionMessage(ace,fileName);
             throw new DocumentNotFoundException(documentData.getParentEntityType(), documentData.getParentEntityId(), documentData.getId());
         }
         return fileData;
@@ -175,15 +176,17 @@ public class S3DocumentStore extends DocumentStore {
         }
     }
 
-    private void getObjectAmazonClientExceptionMessage(AmazonClientException ace) {
+    private void getObjectAmazonClientExceptionMessage(AmazonClientException ace, String filename) {
         String message = "Caught an AmazonClientException, which means the client encountered " +
                 "an internal error while trying to communicate with S3, " +
                 "such as not being able to access the network." +
-                "Error Message: " + ace.getMessage();
+                "Error Message: " + ace.getMessage() +
+                "FileName:      " + filename;
+
         logger.error(message);
     }
 
-    private void getObjectAmazonServiceExceptionMessage(AmazonServiceException ase) {
+    private void getObjectAmazonServiceExceptionMessage(AmazonServiceException ase, String filename) {
         String message = "Caught an AmazonServiceException, which means your request made it " +
                 "to Amazon S3, but was rejected with an error response" +
                 " for some reason." +
@@ -191,7 +194,8 @@ public class S3DocumentStore extends DocumentStore {
                 "HTTP Status Code: " + ase.getStatusCode() +
                 "AWS Error Code:   " + ase.getErrorCode() +
                 "Error Type:       " + ase.getErrorType() +
-                "Request ID:       " + ase.getRequestId();
+                "Request ID:       " + ase.getRequestId() +
+                "FileName:         " + filename;
         logger.error(message);
     }
 }
