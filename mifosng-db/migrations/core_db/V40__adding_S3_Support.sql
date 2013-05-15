@@ -22,3 +22,7 @@ CREATE TABLE IF NOT EXISTS `m_image`(
 	PRIMARY KEY (`id`),
 	UNIQUE(client_id)
 );
+
+UPDATE m_document set storage_type='file_system';
+
+insert into m_image (`client_id`,`key`,`storage_type`) select id,`image_key`,'file_system' from m_client where `image_key` IS NOT NULL;
